@@ -8,7 +8,9 @@ function App() {
 
   const votar = async () => {
     try {
-      const res = await axios.post("http://localhost:3000/votar", { candidato });
+      const res = await axios.post("http://localhost:3000/votar", {
+        candidato,
+      });
       setMensagem(res.data.message);
       setCandidato("");
     } catch (err) {
