@@ -19,8 +19,8 @@ export default function Resultados() {
   }, [location]);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+    <main className="mx-auto max-w-6xl px-4 py-5">
+      <div className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-md sm:p-8">
         <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-800">
           📊 Resultados
         </h2>
