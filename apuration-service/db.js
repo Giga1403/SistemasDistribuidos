@@ -1,12 +1,10 @@
-const { Pool } = require("pg");
+import pg from 'pg';
+const { Pool } = pg;
 
-// configure aqui de acordo com seu ambiente
-const pool = new Pool({
-  user: "localhost",
-  host: "localhost",
-  database: "Sistemas Distribuidos",
-  password: "123456",
-  port: 5432
+export const pool = new Pool({
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  database: process.env.PGDATABASE,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
 });
-
-module.exports = pool;
