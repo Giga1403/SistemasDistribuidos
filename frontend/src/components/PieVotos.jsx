@@ -10,9 +10,9 @@ import {
 const COLORS = [
   "#6C4AB6", // Roxo
   "#FFD600", // Amarelo
+  "#FF6384", // Rosa
   "#2196F3", // Azul
   "#43A047", // Verde
-  "#FF6384", // Rosa
   "#FF9800", // Laranja
 ];
 
@@ -37,7 +37,7 @@ function PieVotos({ candidatos }) {
   }
 
   return (
-    <ResponsiveContainer width="80%" height={250}>
+    <ResponsiveContainer width="80%" height={300}>
       <PieChart>
         <Pie
           data={data}
@@ -51,7 +51,13 @@ function PieVotos({ candidatos }) {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value, name, props) => [`${value} votos`, name]} />
+        <Tooltip
+          formatter={(value, name, props) => [
+            `${props.payload.percent}% - ${value} votos`,
+            name,
+          ]}
+          itemStyle={{}}
+        />
         <Legend />
       </PieChart>
     </ResponsiveContainer>

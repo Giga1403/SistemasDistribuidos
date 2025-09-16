@@ -29,6 +29,38 @@ const nameToUF = (raw) => {
 };
 
 const fmt = (n) => (n ?? 0).toLocaleString("pt-BR", { notation: "compact" });
+const fmtInt = (n) => (n ?? 0).toLocaleString("pt-BR");
+
+// Nome “bonito” por UF (pode mover para constants se quiser)
+const UF_TO_NAME = {
+  AC: "Acre",
+  AL: "Alagoas",
+  AP: "Amapá",
+  AM: "Amazonas",
+  BA: "Bahia",
+  CE: "Ceará",
+  DF: "Distrito Federal",
+  ES: "Espírito Santo",
+  GO: "Goiás",
+  MA: "Maranhão",
+  MT: "Mato Grosso",
+  MS: "Mato Grosso do Sul",
+  MG: "Minas Gerais",
+  PA: "Pará",
+  PB: "Paraíba",
+  PR: "Paraná",
+  PE: "Pernambuco",
+  PI: "Piauí",
+  RJ: "Rio de Janeiro",
+  RN: "Rio Grande do Norte",
+  RS: "Rio Grande do Sul",
+  RO: "Rondônia",
+  RR: "Roraima",
+  SC: "Santa Catarina",
+  SP: "São Paulo",
+  SE: "Sergipe",
+  TO: "Tocantins",
+};
 
 export default function MapaBrasilComLabels({
   votosPorUf = {},
@@ -38,6 +70,15 @@ export default function MapaBrasilComLabels({
   const wrapRef = useRef(null);
   const mapRef = useRef(null);
   const [labels, setLabels] = useState([]);
+  const [selectedUF, setSelectedUF] = useState(null);
+
+  const totalValidos = Object.values(votosPorUf).reduce(
+    (acc, v) => acc + Number(v || 0),
+    0
+  );
+  const selectedValue = Number(selectedUF ? votosPorUf[selectedUF] || 0 : 0);
+  const selectedPct =
+    totalValidos > 0 ? (selectedValue / totalValidos) * 100 : 0;
 
   const recompute = () => {
     const wrap = wrapRef.current;
@@ -79,6 +120,39 @@ export default function MapaBrasilComLabels({
     setLabels(next);
   };
 
+  // Fallback: captura cliques nos path caso a lib não emita onChange
+  useEffect(() => {
+    const svg = mapRef.current?.querySelector("svg");
+    if (!svg) return;
+
+    const handleClick = (e) => {
+      const path = e.target.closest("path");
+      if (!path) return;
+
+      const candidates = [
+        path.getAttribute("data-name"),
+        path.getAttribute("name"),
+        path.getAttribute("aria-label"),
+        path.getAttribute("id"),
+        path.getAttribute("title"),
+        path.querySelector("title")?.textContent,
+      ]
+        .filter(Boolean)
+        .map(cleanName);
+
+      for (const c of candidates) {
+        const uf = nameToUF(c);
+        if (uf) {
+          setSelectedUF(uf);
+          break;
+        }
+      }
+    };
+
+    svg.addEventListener("click", handleClick);
+    return () => svg.removeEventListener("click", handleClick);
+  }, []);
+
   useEffect(() => {
     const id = requestAnimationFrame(recompute);
     return () => cancelAnimationFrame(id);
@@ -114,6 +188,13 @@ export default function MapaBrasilComLabels({
           strokeColor="#94a3b8"
           strokeWidth={0.8}
           hoverColor="#7aa2f7"
+          onChange={(uf) => {
+            const code =
+              typeof uf === "string"
+                ? uf
+                : uf?.uf || uf?.code || uf?.sigla || null;
+            if (code && /^[A-Z]{2}$/.test(code)) setSelectedUF(code);
+          }}
         />
       </div>
 
@@ -127,6 +208,43 @@ export default function MapaBrasilComLabels({
           {fmt(it.value)}
         </span>
       ))}
+
+      {/* Painel de informações do estado selecionado */}
+      <div className="mt-3 grid place-items-center">
+        <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white/70 p-3 shadow-sm backdrop-blur">
+          {selectedUF ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm text-slate-500">Estado</p>
+                <p className="truncate text-base font-semibold text-slate-800">
+                  {UF_TO_NAME[selectedUF] || selectedUF} ({selectedUF})
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-slate-500">
+                  Votos válidos do Vencedor
+                </p>
+                <p className="text-base font-semibold text-slate-800">
+                  {fmtInt(selectedValue)}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {totalValidos > 0
+                    ? `${selectedPct.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })}% do total`
+                    : "—"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-center text-sm text-slate-600">
+              Clique em um estado para ver os votos válidos e a porcentagem no
+              total.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
