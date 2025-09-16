@@ -29,3 +29,16 @@ export async function registrarVoto(payload) {
     throw error;
   }
 }
+
+export async function fetchResultados() {
+  try {
+    const response = await fetch("http://localhost:4000/resultados");
+    if (!response.ok) {
+      throw new Error("Erro ao buscar resultados");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
