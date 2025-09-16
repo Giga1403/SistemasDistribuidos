@@ -32,7 +32,7 @@ export async function registrarVoto(payload) {
 
 export async function fetchResultados() {
   try {
-    const response = await fetch("http://localhost:4000/resultados");
+    const response = await fetch("http://localhost:4000/apurar");
     if (!response.ok) {
       throw new Error("Erro ao buscar resultados");
     }
