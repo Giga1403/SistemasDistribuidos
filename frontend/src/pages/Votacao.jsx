@@ -41,11 +41,6 @@ export default function Votacao({ onConfirm }) {
     loadCandidatos();
   }, []);
 
-  const candidatoSelecionado = useMemo(
-    () => candidatos.find((c) => c.id === candidatoId),
-    [candidatoId, candidatos]
-  );
-
   function toggleBranco() {
     const novo = !votoBranco;
     setVotoBranco(novo);
@@ -101,7 +96,7 @@ export default function Votacao({ onConfirm }) {
       onConfirm();
     } catch (e) {
       console.log("e", e);
-      alert("Erro ao registrar voto:", e.error);
+      alert("Erro ao registrar voto: " + (e.message || "Erro desconhecido"));
     } finally {
       setLoadingSubmit(false);
     }

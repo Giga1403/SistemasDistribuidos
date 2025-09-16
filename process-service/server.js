@@ -42,7 +42,7 @@ app.post('/candidatos', async (req, res) => {
 app.post('/votos', async (req, res) => {
   const {
     cpf, nome, genero, dataNascimento, cidade, estado,
-    tipoVoto, candidatoId   
+    tipoVoto, candidatoId
   } = req.body;
 
   if (!cpf || !nome || !genero || !dataNascimento || !cidade || !estado || !tipoVoto) {
@@ -57,19 +57,26 @@ app.post('/votos', async (req, res) => {
       INSERT INTO eleitores
         (cpf, nome, genero, data_nascimento, cidade, estado, tipo_voto, candidato_id)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      ON CONFLICT (cpf) DO NOTHING
       RETURNING id, criado_em
     `;
     const params = [
       cpf, nome, genero, dataNascimento, cidade, estado,
       tipoVoto, tipoVoto === 'valido' ? candidatoId : null
     ];
+
     const { rows } = await pool.query(sql, params);
-    res.status(201).json(rows[0]);
+    if (rows.length === 0) {
+      // conflito de UNIQUE
+      return res.status(409).json({ error: 'Este CPF já votou.' });
+    }
+    return res.status(201).json(rows[0]);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: 'Erro ao salvar voto' });
+    return res.status(500).json({ error: 'Erro ao salvar voto' });
   }
 });
+
 
 
 app.get('/votos', async (_req, res) => {
