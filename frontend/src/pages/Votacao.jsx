@@ -100,6 +100,7 @@ export default function Votacao({ onConfirm }) {
       alert("Voto registrado com sucesso!");
       onConfirm();
     } catch (e) {
+      console.log("e", e);
       alert("Erro ao registrar voto:", e.error);
     } finally {
       setLoadingSubmit(false);
