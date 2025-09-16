@@ -1,6 +1,6 @@
 export async function fetchCandidatos() {
   try {
-    const response = await fetch("http://localhost:8080/candidatos");
+    const response = await fetch("http://26.55.125.177:8080/candidatos");
     if (!response.ok) {
       throw new Error("Erro ao buscar candidatos");
     }
@@ -13,7 +13,7 @@ export async function fetchCandidatos() {
 
 export async function registrarVoto(payload) {
   try {
-    const response = await fetch("http://localhost:8080/votos", {
+    const response = await fetch("http://26.55.125.177:8080/votos", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function registrarVoto(payload) {
 
 export async function fetchResultados() {
   try {
-    const response = await fetch("http://localhost:4000/apurar");
+    const response = await fetch("http://26.197.240.212:4000/apurar");
     if (!response.ok) {
       throw new Error("Erro ao buscar resultados");
     }

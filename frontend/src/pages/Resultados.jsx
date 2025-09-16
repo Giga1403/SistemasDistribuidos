@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { fetchResultados } from "../api";
 
 export default function Resultados() {
   const [resultados, setResultados] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
     async function loadResultados() {
-      const data = await fetchResultados();
-      setResultados(data);
+      try {
+        const resultado = await fetchResultados();
+        setResultados(resultado.data);
+      } catch (error) {
+        console.error("Erro ao carregar resultados:", error);
+      }
     }
     loadResultados();
-  }, []);
+  }, [location]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -23,11 +29,27 @@ export default function Resultados() {
             {resultados.map((resultado) => (
               <li
                 key={resultado.id}
-                className="rounded-lg border border-slate-300 bg-white p-4 shadow-sm"
+                className="flex items-center gap-4 rounded-lg border border-slate-300 bg-white p-4 shadow-sm"
               >
-                <p className="text-sm font-medium text-slate-700">
-                  Candidato: {resultado.nome} ({resultado.votos} votos)
-                </p>
+                <img
+                  src={resultado.foto_url}
+                  alt={`Foto de ${resultado.nome}`}
+                  className="h-16 w-16 rounded-full object-cover"
+                />
+                <div>
+                  <p className="text-base font-medium text-slate-800">
+                    {resultado.nome}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Votos válidos: {resultado.total_votos_validos}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Votos brancos: {resultado.total_votos_brancos}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Votos nulos: {resultado.total_votos_nulos}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>
