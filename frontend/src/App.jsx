@@ -10,10 +10,6 @@ export default function App() {
     navigate("/resultados");
   }
 
-  function handleNovo() {
-    navigate("/");
-  }
-
   return (
     <>
       <Header />
