@@ -5,6 +5,8 @@ import CandidateCard from "../components/CandidadeCard";
 
 export default function Votacao({ onConfirm }) {
   const [cpf, setCpf] = useState("");
+  const [nome, setNome] = useState("");
+  const [genero, setGenero] = useState("");
 
   function maskCpf(value) {
     value = value.replace(/\D/g, "");
@@ -31,6 +33,11 @@ export default function Votacao({ onConfirm }) {
     loadCandidatos();
   }, []);
 
+  const candidatoSelecionado = useMemo(
+    () => candidatos.find((c) => c.id === candidatoId),
+    [candidatoId, candidatos]
+  );
+
   function toggleBranco() {
     const novo = !votoBranco;
     setVotoBranco(novo);
@@ -51,6 +58,8 @@ export default function Votacao({ onConfirm }) {
   function validar() {
     const cpfLimpo = cpf.replace(/\D/g, "");
     if (cpfLimpo.length !== 11) return "Informe um CPF válido.";
+    if (!nome.trim()) return "Informe o nome.";
+    if (!genero) return "Selecione o gênero.";
     if (!nascimento) return "Informe a data de nascimento.";
     if (!uf) return "Selecione o estado.";
     if (!cidade.trim()) return "Informe a cidade.";
@@ -68,6 +77,8 @@ export default function Votacao({ onConfirm }) {
     }
     const payload = {
       cpf: cpf.replace(/\D/g, ""),
+      nome,
+      genero,
       dataNascimento: nascimento,
       estado: uf,
       cidade,
@@ -78,8 +89,7 @@ export default function Votacao({ onConfirm }) {
       await registrarVoto(payload);
       alert("Voto registrado com sucesso!");
       onConfirm();
-    } catch (e) {
-      console.log("e", e);
+    } catch {
       alert("Erro ao registrar voto. Tente novamente.");
     }
   }
@@ -112,6 +122,35 @@ export default function Votacao({ onConfirm }) {
                 placeholder="000.000.000-00"
                 maxLength={14}
               />
+            </div>
+
+            <div className="space-y-1">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Nome *
+              </label>
+              <input
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-indigo-400 transition focus:ring-2"
+                placeholder="Digite seu nome"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Gênero *
+              </label>
+              <select
+                value={genero}
+                onChange={(e) => setGenero(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-indigo-400 transition focus:ring-2"
+              >
+                <option value="">Selecione o gênero</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="outro">Outro</option>
+              </select>
             </div>
 
             <div className="space-y-1">
@@ -196,7 +235,7 @@ export default function Votacao({ onConfirm }) {
               ].join(" ")}
             >
               <div className="mx-auto mb-2 grid h-8 w-8 place-items-center rounded bg-slate-100 text-lg">
-                ☑️
+                &#9745;
               </div>
               <div className="text-sm font-medium text-slate-700">
                 Voto em Branco
@@ -213,7 +252,7 @@ export default function Votacao({ onConfirm }) {
               ].join(" ")}
             >
               <div className="mx-auto mb-2 grid h-8 w-8 place-items-center rounded bg-slate-100 text-lg">
-                ❌
+                &#10060;
               </div>
               <div className="text-sm font-medium text-slate-700">
                 Voto Nulo
