@@ -78,7 +78,8 @@ export default function Votacao({ onConfirm }) {
       await registrarVoto(payload);
       alert("Voto registrado com sucesso!");
       onConfirm();
-    } catch {
+    } catch (e) {
+      console.log("e", e);
       alert("Erro ao registrar voto. Tente novamente.");
     }
   }
