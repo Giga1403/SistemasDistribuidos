@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { ESTADOS } from "../constants";
 import { fetchCandidatos, registrarVoto } from "../api";
 import CandidateCard from "../components/CandidadeCard";
+import Spinner from "../components/Spinner";
 
 export default function Votacao({ onConfirm }) {
   const [cpf, setCpf] = useState("");
@@ -16,6 +17,8 @@ export default function Votacao({ onConfirm }) {
   const [votoNulo, setVotoNulo] = useState(false);
 
   const [candidatos, setCandidatos] = useState([]);
+  const [loadingCandidatos, setLoadingCandidatos] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   function maskCpf(value) {
     value = value.replace(/\D/g, "");
@@ -27,8 +30,13 @@ export default function Votacao({ onConfirm }) {
 
   useEffect(() => {
     async function loadCandidatos() {
-      const data = await fetchCandidatos();
-      setCandidatos(data);
+      setLoadingCandidatos(true);
+      try {
+        const data = await fetchCandidatos();
+        setCandidatos(data);
+      } finally {
+        setLoadingCandidatos(false);
+      }
     }
     loadCandidatos();
   }, []);
@@ -86,17 +94,20 @@ export default function Votacao({ onConfirm }) {
       tipoVoto: votoBranco ? "branco" : votoNulo ? "nulo" : "valido",
       candidatoId: votoBranco || votoNulo ? null : candidatoId,
     };
+    setLoadingSubmit(true);
     try {
       await registrarVoto(payload);
       alert("Voto registrado com sucesso!");
       onConfirm();
     } catch {
       alert("Erro ao registrar voto. Tente novamente.");
+    } finally {
+      setLoadingSubmit(false);
     }
   }
 
   return (
-    <main className="relative mx-auto max-w-6xl px-4 py-5">
+    <main className="relative mx-auto max-w-8xl px-4 py-5">
       <form
         onSubmit={onSubmit}
         className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-md sm:p-8"
@@ -200,63 +211,75 @@ export default function Votacao({ onConfirm }) {
         <section className="mb-6">
           <h2 className="text-sm font-semibold text-slate-900 pb-4">Votação</h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Candidatos */}
-            <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {candidatos.map((c) => (
-                <CandidateCard
-                  key={c.id}
-                  candidato={c}
-                  selecionado={candidatoId}
-                  onSelect={(id) => {
-                    setCandidatoId(id);
-                    setVotoBranco(false);
-                    setVotoNulo(false);
-                  }}
-                  disabled={votoBranco || votoNulo}
-                />
-              ))}
+          {/* Candidatos Section */}
+          {loadingCandidatos ? (
+            <div className="flex justify-center items-center">
+              <Spinner />
             </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Candidatos */}
+              <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {candidatos.map((c) => (
+                  <CandidateCard
+                    key={c.id}
+                    candidato={c}
+                    selecionado={candidatoId}
+                    onSelect={(id) => {
+                      setCandidatoId(id);
+                      setVotoBranco(false);
+                      setVotoNulo(false);
+                    }}
+                    size={400}
+                    disabled={votoBranco || votoNulo}
+                  />
+                ))}
+              </div>
 
-            {/* Branco / Nulo */}
-            <div className="flex flex-col items-center gap-4">
-              <button
-                type="button"
-                onClick={toggleBranco}
-                className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
-                  votoBranco
-                    ? "bg-indigo-100 ring-2 ring-indigo-500"
-                    : "bg-white"
-                }`}
-              >
-                <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-indigo-50 text-lg">
-                  &#9745;
-                </div>
-                <div className="text-sm font-medium text-slate-700">
-                  Voto em Branco
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={toggleNulo}
-                className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
-                  votoNulo ? "bg-red-100 ring-2 ring-red-500" : "bg-white"
-                }`}
-              >
-                <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-red-50 text-lg">
-                  &#10060;
-                </div>
-                <div className="text-sm font-medium text-slate-700">
-                  Voto Nulo
-                </div>
-              </button>
+              {/* Branco / Nulo */}
+              <div className="flex flex-col items-center gap-4">
+                <button
+                  type="button"
+                  onClick={toggleBranco}
+                  className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
+                    votoBranco
+                      ? "bg-indigo-100 ring-2 ring-indigo-500"
+                      : "bg-white"
+                  }`}
+                >
+                  <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-indigo-50 text-lg">
+                    &#9745;
+                  </div>
+                  <div className="text-sm font-medium text-slate-700">
+                    Voto em Branco
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleNulo}
+                  className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
+                    votoNulo ? "bg-red-100 ring-2 ring-red-500" : "bg-white"
+                  }`}
+                >
+                  <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-red-50 text-lg">
+                    &#10060;
+                  </div>
+                  <div className="text-sm font-medium text-slate-700">
+                    Voto Nulo
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <div className="mt-8 flex justify-center">
-          <button className="rounded-xl bg-yellow-600 px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 cursor-pointer">
-            Confirmar voto
+          <button
+            type="submit"
+            className="rounded-xl bg-yellow-600 px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 cursor-pointer"
+            disabled={loadingSubmit}
+          >
+            {loadingSubmit ? "Processando..." : "Confirmar voto"}
           </button>
         </div>
       </form>

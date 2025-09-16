@@ -3,6 +3,7 @@ export default function CandidateCard({
   selecionado,
   onSelect,
   disabled,
+  size,
 }) {
   const active = selecionado === candidato.id;
 
@@ -22,7 +23,8 @@ export default function CandidateCard({
       <img
         src={candidato.foto_url}
         alt={candidato.nome}
-        className="h-60 w-full object-cover"
+        className=" w-full object-cover"
+        style={{ height: size || 400 }}
       />
 
       <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-3">
