@@ -20,9 +20,6 @@ export async function registrarVoto(payload) {
       },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) {
-      throw new Error("Erro ao registrar voto");
-    }
     return await response.json();
   } catch (error) {
     console.error(error);
