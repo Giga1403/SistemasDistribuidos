@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { CANDIDATOS, ESTADOS } from "../constants";
+import { useMemo, useState, useEffect } from "react";
+import { ESTADOS } from "../constants";
+import { fetchCandidatos, registrarVoto } from "../api";
 import CandidateCard from "../components/CandidadeCard";
 
 export default function Votacao({ onConfirm }) {
@@ -20,10 +21,15 @@ export default function Votacao({ onConfirm }) {
   const [votoBranco, setVotoBranco] = useState(false);
   const [votoNulo, setVotoNulo] = useState(false);
 
-  const candidatoSelecionado = useMemo(
-    () => CANDIDATOS.find((c) => c.id === candidatoId),
-    [candidatoId]
-  );
+  const [candidatos, setCandidatos] = useState([]);
+
+  useEffect(() => {
+    async function loadCandidatos() {
+      const data = await fetchCandidatos();
+      setCandidatos(data);
+    }
+    loadCandidatos();
+  }, []);
 
   function toggleBranco() {
     const novo = !votoBranco;
@@ -53,7 +59,7 @@ export default function Votacao({ onConfirm }) {
     return null;
   }
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     const erro = validar();
     if (erro) {
@@ -61,18 +67,20 @@ export default function Votacao({ onConfirm }) {
       return;
     }
     const payload = {
-      eleitor: { cpf, nascimento, uf, cidade },
-      voto: votoBranco
-        ? "BRANCO"
-        : votoNulo
-        ? "NULO"
-        : {
-            candidatoId,
-            nome: candidatoSelecionado?.nome,
-          },
-      dataHora: new Date().toISOString(),
+      cpf: cpf.replace(/\D/g, ""),
+      dataNascimento: nascimento,
+      estado: uf,
+      cidade,
+      tipoVoto: votoBranco ? "branco" : votoNulo ? "nulo" : "valido",
+      candidatoId: votoBranco || votoNulo ? null : candidatoId,
     };
-    onConfirm(payload);
+    try {
+      await registrarVoto(payload);
+      alert("Voto registrado com sucesso!");
+      onConfirm();
+    } catch {
+      alert("Erro ao registrar voto. Tente novamente.");
+    }
   }
 
   return (
@@ -155,7 +163,7 @@ export default function Votacao({ onConfirm }) {
             Escolha seu Candidato
           </h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {CANDIDATOS.map((c) => (
+            {candidatos.map((c) => (
               <CandidateCard
                 key={c.id}
                 candidato={c}

@@ -20,14 +20,15 @@ export default function CandidateCard({
     >
       <div className="flex items-center gap-4">
         <div className="grid h-14 w-14 place-items-center rounded-lg bg-indigo-50 text-3xl">
-          {candidato.emoji}
+          <img
+            src={candidato.foto_url}
+            alt={candidato.nome}
+            className="h-full w-full rounded-lg object-cover"
+          />
         </div>
         <div className="min-w-0">
           <div className="truncate text-base font-semibold text-slate-800">
             {candidato.nome}
-          </div>
-          <div className="mx-auto mt-3 w-40 rounded-full bg-indigo-50 px-2 py-1 text-center text-xs font-medium text-indigo-700">
-            Candidato {candidato.numero}
           </div>
         </div>
       </div>

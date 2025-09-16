@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import "./index.css";
 import Votacao from "./pages/Votacao";

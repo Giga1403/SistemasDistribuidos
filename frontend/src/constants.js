@@ -1,12 +1,3 @@
-export const CANDIDATOS = [
-  { id: 1, nome: "Ana Silva", numero: "10", emoji: "🧑‍💼" },
-  { id: 2, nome: "Carlos Santos", numero: "20", emoji: "🧑‍💼" },
-  { id: 3, nome: "Maria Oliveira", numero: "30", emoji: "👩‍🎓" },
-  { id: 4, nome: "João Pereira", numero: "40", emoji: "👨‍🦳" },
-  { id: 5, nome: "Lucia Costa", numero: "50", emoji: "👩‍⚖️" },
-  { id: 6, nome: "Roberto Lima", numero: "60", emoji: "🧑‍⚖️" },
-];
-
 export const ESTADOS = [
   "AC",
   "AL",
