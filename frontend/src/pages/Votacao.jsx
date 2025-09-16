@@ -213,69 +213,74 @@ export default function Votacao({ onConfirm }) {
               <Spinner />
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
               {/* Candidatos */}
-              <div className="lg:col-span-3 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {candidatos.map((c) => (
-                  <CandidateCard
-                    key={c.id}
-                    candidato={c}
-                    selecionado={candidatoId}
-                    onSelect={(id) => {
-                      setCandidatoId(id);
-                      setVotoBranco(false);
-                      setVotoNulo(false);
-                    }}
-                    size={400}
-                    disabled={votoBranco || votoNulo}
-                  />
-                ))}
-              </div>
-
-              {/* Branco / Nulo */}
-              <div className="flex flex-col items-center gap-4">
-                <button
-                  type="button"
-                  onClick={toggleBranco}
-                  className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
-                    votoBranco
-                      ? "bg-indigo-100 ring-2 ring-indigo-500"
-                      : "bg-white"
-                  }`}
-                >
-                  <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-indigo-50 text-lg">
-                    &#9745;
-                  </div>
-                  <div className="text-sm font-medium text-slate-700">
-                    Voto em Branco
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={toggleNulo}
-                  className={`w-40 rounded-xl p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
-                    votoNulo ? "bg-red-100 ring-2 ring-red-500" : "bg-white"
-                  }`}
-                >
-                  <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-red-50 text-lg">
-                    &#10060;
-                  </div>
-                  <div className="text-sm font-medium text-slate-700">
-                    Voto Nulo
-                  </div>
-                </button>
-              </div>
+              {candidatos.map((c) => (
+                <CandidateCard
+                  key={c.id}
+                  candidato={c}
+                  selecionado={candidatoId}
+                  onSelect={(id) => {
+                    setCandidatoId(id);
+                    setVotoBranco(false);
+                    setVotoNulo(false);
+                  }}
+                  size={300}
+                  disabled={votoBranco || votoNulo}
+                />
+              ))}
             </div>
           )}
         </section>
 
-        <div className="mt-8 flex justify-center">
+        {/* Branco / Nulo */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 items-center gap-5">
+          <button
+            type="button"
+            onClick={toggleBranco}
+            className={`w-full h-30 rounded-xl p-4 text-center shadow-   transition hover:shadow-md cursor-pointer ${
+              votoBranco ? "bg-indigo-100 ring-2 ring-indigo-500" : "bg-white"
+            }`}
+          >
+            <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-gray-100 text-lg">
+              📄
+            </div>
+            <div className="text-sm font-medium text-slate-700">
+              Voto em Branco
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={toggleNulo}
+            className={`w-full rounded-xl h-30 p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
+              votoNulo ? "bg-red-100 ring-2 ring-red-500" : "bg-white"
+            }`}
+          >
+            <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full bg-red-50 text-lg">
+              &#10060;
+            </div>
+            <div className="text-sm font-medium text-slate-700">Voto Nulo</div>
+          </button>
+
           <button
             type="submit"
-            className="rounded-xl bg-yellow-600 px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 cursor-pointer"
+            className={`w-full rounded-xl h-30 p-4 text-center shadow-sm transition hover:shadow-md cursor-pointer ${
+              loadingSubmit
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-green-100"
+            }`}
             disabled={loadingSubmit}
           >
-            {loadingSubmit ? "Processando..." : "Confirmar voto"}
+            <div
+              className={`mx-auto mb-2 grid h-10 w-10 place-items-center rounded-full ${
+                loadingSubmit ? "bg-gray-100 text-gray-400" : "bg-green-50"
+              } text-lg`}
+            >
+              ✅
+            </div>
+            <div className="text-sm font-medium text-slate-700">
+              {loadingSubmit ? "Processando..." : "Confirmar voto"}
+            </div>
           </button>
         </div>
       </form>

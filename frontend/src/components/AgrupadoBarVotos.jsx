@@ -13,6 +13,7 @@ function AgrupadoBarVotos({ data, candidatos }) {
   const colors = [
     "#6C4AB6", // Roxo
     "#FFD600", // Amarelo
+    "#FF6384", // Rosa
     "#2196F3", // Azul
     "#43A047", // Verde
     "#FF6384", // Rosa
