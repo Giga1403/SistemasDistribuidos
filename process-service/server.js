@@ -7,12 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health
+
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// ---------------- Candidatos ----------------
 
-// Listar candidatos
 app.get('/candidatos', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT id, nome, foto_url FROM candidatos ORDER BY id');
@@ -23,7 +21,7 @@ app.get('/candidatos', async (_req, res) => {
   }
 });
 
-// (Opcional) Criar candidato rapidamente
+
 app.post('/candidatos', async (req, res) => {
   const { nome, foto_url } = req.body;
   if (!nome) return res.status(400).json({ error: 'nome é obrigatório' });
@@ -39,13 +37,12 @@ app.post('/candidatos', async (req, res) => {
   }
 });
 
-// ---------------- Votos (eleitor) ----------------
 
-// Registrar voto (grava dados do eleitor + tipo de voto + candidato_id)
+
 app.post('/votos', async (req, res) => {
   const {
     cpf, nome, genero, dataNascimento, cidade, estado,
-    tipoVoto, candidatoId   // candidatoId obrigatório somente quando tipoVoto='valido'
+    tipoVoto, candidatoId   
   } = req.body;
 
   if (!cpf || !nome || !genero || !dataNascimento || !cidade || !estado || !tipoVoto) {
@@ -74,7 +71,7 @@ app.post('/votos', async (req, res) => {
   }
 });
 
-// (Opcional) Listar votos já registrados (útil para apuração)
+
 app.get('/votos', async (_req, res) => {
   try {
     const { rows } = await pool.query(`
